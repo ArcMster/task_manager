@@ -1,0 +1,144 @@
+task
+
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-giJF6kkoqNQ00vy+HMDP7azOuL0xtbfIcaT9wjKHr8RbDVddVHyTfAAsrekwKmP1" crossorigin="anonymous">
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/js/bootstrap.bundle.min.js" integrity="sha384-ygbV9kiqUc6oa4msXn9868pTtWMgiQaeYH7/t7LECLbyPA2x65Kgf80OJFdroafW" crossorigin="anonymous"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
+
+<h2>Add New Task</h2>
+<div class="card shadow-sm bg-white rounded" style="width: 18rem; margin: 15px;">
+    <div class="card-body">
+    <h5 class="card-title">New Task</h5>
+    <h6 class="card-subtitle mb-2 text-muted"></h6>
+    <label class="form=label">Task</label><br>
+    <p class="card-text"><input type="text" placeholder="Enter your task" id="new_task"</p>
+    <div class="form-group row">
+        <label for="example-datetime-local-input" class="form-label">Date and time</label><br>
+        <div class="col-10">
+          <input class="form-control" type="datetime-local"   id="new_date">
+        </div>
+    </div>
+    <br>
+    <button type="button" class="btn btn-primary" onclick="create()">Create Task</button>
+    
+    <!--<a href="#" class="card-link">Card link</a>
+    <a href="#" class="card-link">Another link</a>-->
+    </div>
+</div>
+
+
+
+<h2>Please review the following tasks</h2>
+{% csrf_token %}
+
+<div class="container-fluid" id="all_tasks" style="display: flex;flex-wrap: wrap;">
+{% for i in tasks %}
+
+    <div class="card shadow-sm bg-white rounded" style="width: 18rem; margin: 15px;">
+        <div class="card-body">
+        <h5 class="card-title">{{i.employee}}</h5>
+        <h6 class="card-subtitle mb-2 text-muted">{{i.employee}}</h6>
+        <label class="form=label">Task</label><br>
+        <p class="card-text"><input type="text" value="{{i.task}}" id="task{{i.id}}"</p>
+        <div class="form-group row">
+            <label for="example-datetime-local-input" class="form-label">Date and time</label><br>
+            <div class="col-10">
+              <input class="form-control" type="datetime-local" value="{{ i.time|date:'Y-m-d' }}T{{ i.time|date:'H:i:s' }}"  id="time{{i.id}}">
+            </div>
+        </div>
+        <br>
+        <button type="button" class="btn btn-primary" onclick="update({{i.id}})">Update</button>
+        <button type="button" class="btn btn-danger">Delete</button>
+        <!--<a href="#" class="card-link">Card link</a>
+        <a href="#" class="card-link">Another link</a>-->
+        </div>
+    </div>
+
+{% endfor %}
+</div>
+<script>
+
+    function getCookie(name) {
+        var cookieValue = null;
+        if (document.cookie && document.cookie != '') {
+            var cookies = document.cookie.split(';');
+            for (var i = 0; i < cookies.length; i++) {
+                var cookie = jQuery.trim(cookies[i]);
+                // Does this cookie string begin with the name we want?
+                if (cookie.substring(0, name.length + 1) == (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+            return cookieValue;
+        }
+
+    function update(id){
+        console.log(id)
+        
+        var task = document.getElementById("task"+id).value
+        var time = document.getElementById('time'+id).value
+        var token = document.querySelector('[name=csrfmiddlewaretoken]').value
+        console.log(token)
+        console.log(task, time)
+        
+
+        $.ajax({
+            headers: { "X-CSRFToken": token },
+            url: 'taskupdate',
+            type: 'POST',
+            data:{task: task, time: time, id: id},
+            success: function(data,event){
+                console.log('success')
+            }
+        })
+    }
+
+    function create(id){
+        var task = document.getElementById('new_task').value;
+        var time = document.getElementById('new_date').value;
+        var token = document.querySelector('[name=csrfmiddlewaretoken]').value;
+        $.ajax({
+            headers: { "X-CSRFToken": token },
+            url: 'add_task',
+            type: 'POST',
+            data:{task: task, time: time},
+            success: function(data,event){
+                console.log('working')
+                console.log(data)
+                console.log(document.getElementById('all_tasks').innerHTML)
+                var html_content = document.getElementById('all_tasks').innerHTML
+                
+                if(data.value == 'task added'){
+                    document.getElementById('all_tasks').innerHTML += html_content
+                    /*
+                    document.getElementById('all_tasks').innerHTML += "
+                    <div class="card shadow-sm bg-white rounded" style="width: 18rem; margin: 15px;">
+                        <div class="card-body">
+                        <h5 class="card-title">New task</h5>
+                        <h6 class="card-subtitle mb-2 text-muted">task</h6>
+                        <label class="form=label">Task</label><br>
+                        <p class="card-text"><input type="text" value="test" id="task{{i.id}}"</p>
+                        <div class="form-group row">
+                            <label for="example-datetime-local-input" class="form-label">Date and time</label><br>
+                            <div class="col-10">
+                              <input class="form-control" type="datetime-local" value="test"  id="time{{i.id}}">
+                            </div>
+                        </div>
+                        <br>
+                        <button type="button" class="btn btn-primary" onclick="update({{i.id}})">Update</button>
+                        <button type="button" class="btn btn-danger">Delete</button>
+                        
+                        </div>
+                    </div>"*/
+
+                    console.log('working..')
+                }
+            }
+        })
+
+        
+    }
+</script>
+

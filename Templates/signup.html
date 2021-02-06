@@ -1,0 +1,146 @@
+{% extends 'base.html' %}
+
+
+{% block content %}
+
+<div class="container" style="margin-top: 100px;">
+    <h3>
+        Sign Up <br>
+        <h6 id="tagline" style="margin-bottom: 20px;">
+            It's quick and easy.
+        </h6>
+    </h3>
+    <form method="POST" id = "form">
+        {% csrf_token %}
+        <div class="form-group" style="margin-bottom: 20px;">
+            <input type = "text" name="f_name" id="f_name" placeholder="First name" class="form-control" required style="width: 50%;" required>
+        </div>
+        <div class="form-group" style="margin-bottom: 20px;">
+            <input type = "text" name="l_name" id="l_name" placeholder="Last name" class="form-control" required style="width: 50%;" required>
+        </div>
+        <div class="form-group" style="margin-bottom: 20px;">
+            <input type = "text" name="uname" placeholder="Username" id="uname" class="form-control" required style="width: 50%;" required>
+        </div>
+        <div class="form-group" style="margin-bottom: 20px;">
+            <input type = "text" name="email" id="email" placeholder="Email id" class="form-control" required style="width: 50%;" required>
+        </div>
+        <div class="form-group" style="margin-bottom: 20px;">
+            <input type = "password" name="passwd" id="passwd" placeholder="Password" class="form-control" required style="width: 50%;" required>
+        </div>
+        <div class="form-group" style="margin-bottom: 20px;">
+            <input type = "password" name="cpasswd" id="cpasswd" placeholder="Confirm Password" class="form-control" required style="width: 50%;" required>
+        </div>
+        <div class="form-group" style="margin-bottom: 20px;">
+            <button class="btn btn-primary" type="submit">Create Account</button>
+        </div>
+    </form>
+    <div id="warning"></div>
+</div>
+<script>
+    function Usercreate(){
+    var uname = document.getElementById('uname').value
+    var f_name = document.getElementById('f_name').value
+    var l_name = document.getElementById('l_name').value
+    var email = document.getElementById('email').value
+    var passwd = document.getElementById('passwd').value
+    var cpasswd = document.getElementById('cpasswd').value
+    var token = document.querySelector('[name=csrfmiddlewaretoken]').value;
+    var clickval = "no"
+    if(passwd == cpasswd){
+        $.ajax({
+            headers: { "X-CSRFToken": token },
+            method: 'POST',
+            data: {uname: uname, f_name: f_name, l_name: l_name, email: email, passwd: passwd },
+            url: 'user_registration',
+            
+            success: function (data, event){
+                console.log(data.value)
+                clickval = data.value;
+                
+                //window.location.href = "http://www.w3schools.com";
+                
+                
+                    
+            },
+      
+            error: function(){
+                console.log('error occured')
+                
+            }, 
+            async : false
+            
+          })
+          
+          
+          
+    }
+    else{
+        document.getElementById('tagline').innerHTML = "Passwords doesn't match"
+        alert("Passwords doesn't match !")
+        document.getElementById('tagline').style.color = 'red'
+        //window.location.href = 'http://127.0.0.1:8000/signup'
+        document.getElementById('uname').value = "";
+        document.getElementById('f_name').value = "";
+        document.getElementById('l_name').value = "";
+        document.getElementById('email').value = "";
+        document.getElementById('passwd').value = "";
+        document.getElementById('cpasswd').value = "";
+    }
+    return clickval;
+}
+ 
+const form = document.getElementById('form')
+form.addEventListener('submit',(e) => {
+    e.preventDefault();
+
+    
+    var clickval = Usercreate();
+    console.log('even click listener')
+    console.log(clickval)
+    if(clickval == "user_created"){
+        e.preventDefault();
+        console.log('account has been created')
+        alert('Your account has been created. Please login to continue.')
+        window.location.href = "http://127.0.0.1:8000";
+        
+    }
+    else if(clickval == 'username_exists'){
+        document.getElementById('tagline').innerHTML = "Username already exists !"
+        document.getElementById('tagline').style.color = 'red'
+        alert("Username aleady exists !")
+        //window.location.href = 'http://127.0.0.1:8000/signup'
+        document.getElementById('uname').value = "";
+        document.getElementById('f_name').value = "";
+        document.getElementById('l_name').value = "";
+        document.getElementById('email').value = "";
+        document.getElementById('passwd').value = "";
+        document.getElementById('cpasswd').value = "";
+    }
+    else if(clickval == 'email_exists'){
+        document.getElementById('tagline').innerHTML = "Email already exists !"
+        document.getElementById('tagline').style.color = 'red'
+        alert("Email aleady exists !")
+        //window.location.href = 'http://127.0.0.1:8000/signup'
+        document.getElementById('uname').value = "";
+        document.getElementById('f_name').value = "";
+        document.getElementById('l_name').value = "";
+        document.getElementById('email').value = "";
+        document.getElementById('passwd').value = "";
+        document.getElementById('cpasswd').value = "";
+    }
+    else{
+        document.getElementById('tagline').innerHTML = "Please enter your details again."
+        
+        //window.location.href = 'http://127.0.0.1:8000/signup'
+        document.getElementById('uname').value = "";
+        document.getElementById('f_name').value = "";
+        document.getElementById('l_name').value = "";
+        document.getElementById('email').value = "";
+        document.getElementById('passwd').value = "";
+        document.getElementById('cpasswd').value = "";
+    }
+})
+  
+
+</script>
+{% endblock %}

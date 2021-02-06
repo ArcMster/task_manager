@@ -1,0 +1,70 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<form action="login" style = 'margin-top: 100px;' class= 'container' method="POST" id="form">
+    
+    {% csrf_token %}
+    <h2 style="font-family:'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif ;margin-bottom: 20px;">TASK MANAGER</h2>
+    <h6>
+        <small id="warning" style="color: red;">
+            
+        </small>
+    </h6>
+    <div class="form-group" style="margin-bottom: 20px;">
+        <input type = "text" name="userid" placeholder="User id" class="form-control" required style="width: 35%;" id = 'userid'>
+    </div>
+    <div class="form-group" style="margin-bottom: 20px;">
+        <input type="password" name="password" placeholder="Password" class="form-control" style="width: 35%;" id="password">
+    </div>
+    
+    <div class="form-group" style="margin-bottom: 20px;">
+        <button class="btn btn-primary" type="submit">Login</button>
+        
+    </div>
+
+    <h4>
+        New user ?
+        Click <a href="/signup">here</a> to signup
+    </h4>
+</form>
+
+<script>
+
+
+const form = document.getElementById('form')
+
+form.addEventListener('submit',(e) => {
+    e.preventDefault();
+    var userid = document.getElementById('userid').value;
+    var password = document.getElementById('password').value;
+    var token = document.querySelector('[name=csrfmiddlewaretoken]').value;
+    
+    $.ajax({
+        headers: { "X-CSRFToken": token },
+        method: 'POST',
+        url: 'user_login',
+        
+        data: {userid: userid,password: password},
+        success: function(data, event){
+            if(data.value == 'invalid'){
+                document.getElementById('warning').innerHTML = 'Invalid credentials'
+            }
+            else if(data.value == 'valid'){
+                window.location.href = '/home'
+            }
+        },
+        error: function(){
+            console.log('error occured')
+            
+        }, 
+        async : false
+    })
+    
+    //clickval = Signin()
+})
+
+</script>
+
+
+{% endblock %}
