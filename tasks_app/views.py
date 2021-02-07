@@ -17,12 +17,13 @@ class taskfile(APIView):
         days = datetime.timedelta(5)
         filter_limit = datetime.datetime.now() - days
         current_tasks = Tasks.objects.filter(time__gt = filter_limit)
-        outdict = {'Employee': [],'Task': [], 'Time': []}
+        outdict = {'Employee': [],'Task': [], 'Time': [], 'Comments': []}
         for i in current_tasks:
             
             outdict['Employee'].append(i.employee.username)
             outdict['Task'].append(i.task)
             outdict['Time'].append(str(i.time.strftime("%Y-%m-%d %H:%M:%S")))
+            outdict['Comments'].append(i.comments)
         outputdf = pd.DataFrame(outdict)
         locations = Location.objects.values('location')
         print(locations)
